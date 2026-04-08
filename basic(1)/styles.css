@@ -1,0 +1,61 @@
+/* 💡 DICA DE OURO: Sempre importe o reset.css ANTES do seu styles.css no HTML, 
+   assim o reset limpa a sujeira do navegador e as suas regras personalizadas (aqui) têm prioridade! */
+
+body {
+    background-color: #0d0d0d;
+    color: #00ffcc;
+    font-family: 'Courier New', Courier, monospace;
+    margin: 0;
+    padding: 20px;
+    
+    /* 💡 DICA FLEXBOX: O Flexbox no body está centralizando todo o conteúdo (main) na tela. */
+    display: flex;
+    flex-direction: column; /* Coloca os elementos um embaixo do outro */
+    align-items: center;    /* Centraliza os elementos no eixo cruzado (horizontal, neste caso) */
+}
+
+main {
+    max-width: 800px;
+    text-align: center;
+    border: 1px solid #ff0055;
+    padding: 30px;
+    /* 💡 DICA DE DESIGN: Sombras dão profundidade. Os valores são: deslocamento-x, deslocamento-y, desfoque, cor. */
+    box-shadow: 0 0 15px rgba(255, 0, 85, 0.3); 
+}
+
+h1 {
+    color: #ff0055;
+    text-transform: uppercase; /* Transforma o texto em MAIÚSCULAS automaticamente */
+}
+
+p {
+    line-height: 1.6; /* Aumentar o espaço entre linhas facilita muito a leitura do usuário */
+    color: #cccccc;
+    text-align: justify;
+}
+
+.links-container {
+    margin: 20px 0;
+}
+
+a {
+    color: #00ffcc;
+    text-decoration: none; /* Remove aquele sublinhado feio padrão dos links */
+    border: 1px solid #00ffcc;
+    padding: 10px 20px;
+    margin: 0 10px;
+    /* 💡 DICA DE ANIMAÇÃO: O 'transition' faz com que qualquer mudança de estado (como o :hover abaixo) aconteça suavemente em 0.3 segundos. */
+    transition: all 0.3s ease; 
+}
+
+a:hover {
+    background-color: #00ffcc;
+    color: #0d0d0d;
+}
+
+.imagem-tematica {
+    max-width: 100%; /* Garante que a imagem nunca vaze para fora da caixa mãe (main) no celular */
+    height: auto;    /* Mantém a proporção da imagem para ela não ficar esticada */
+    margin-top: 20px;
+    border: 2px dashed #ff0055;
+}
