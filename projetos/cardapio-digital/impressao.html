@@ -1,0 +1,249 @@
+<!doctype html>
+<html lang="pt-BR">
+  <!-- ============================================================
+       PROJETO DE ESTUDO: CSS PARA IMPRESSÃO (PRINT CSS)
+       ============================================================
+       A parte menos ensinada do CSS: gerar material GRÁFICO
+       (um cardápio físico de verdade) direto do navegador.
+
+       O que este arquivo ensina:
+       1. Unidades físicas (mm, pt) — em papel, px não existe
+       2. @page: definir o tamanho exato da folha
+       3. @media print: uma página, dois comportamentos
+       4. break-after: page — paginação controlada
+       5. Dot leaders (pontilhado nome.....preço) com flexbox
+       6. print-color-adjust: forçar cores no papel
+
+       Fluxo real: abrir no Chrome → Imprimir → Salvar como PDF
+       → mandar para a gráfica. Sem Illustrator, sem Canva.
+       ============================================================ -->
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Print CSS — Cardápio Impresso (estudo)</title>
+    <style>
+      :root {
+        /* Em impresso claro, o laranja precisa ESCURECER para
+           manter contraste sobre branco (o inverso do dark
+           theme da versão digital)                              */
+        --acento: #e85d2a;
+        --apoio: #2f8f3e;
+        --tinta: #1d1a17;
+        --tinta-suave: #6b645c;
+        --linha: rgba(0, 0, 0, 0.14);
+
+        /* Margens como variáveis: a gráfica pediu 2mm a mais?
+           Muda aqui, o layout inteiro acompanha.                */
+        --margem: 11mm;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        /* O fundo cinza é só para a TELA: destaca a "folha"
+           como num editor de documentos. Some na impressão.     */
+        background: #4a4a4a;
+        font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        color: var(--tinta);
+      }
+
+      /* ── A FOLHA ─────────────────────────────────────────────
+         width/height em MILÍMETROS: 150mm × 210mm (15×21cm).
+         No papel, 1mm é 1mm — o navegador converte para a
+         resolução da impressora. Nunca use px para medidas
+         físicas.                                                */
+      .page {
+        position: relative;
+        width: 150mm;
+        height: 210mm;
+        background: #fff;
+        overflow: hidden;
+        padding: var(--margem);
+        display: flex;
+        flex-direction: column;
+
+        /* Cada .page vira UMA folha: quebra de página forçada
+           após o elemento (propriedade nova + fallback webkit)  */
+        break-after: page;
+        page-break-after: always;
+      }
+      .page:last-child {
+        break-after: auto;
+        page-break-after: auto;
+      }
+
+      /* ── TÍTULO DE SEÇÃO ─────────────────────────────────────
+         Fontes em pt (ponto tipográfico = 1/72"), a unidade
+         padrão do mundo gráfico                                 */
+      .sec {
+        text-align: center;
+        margin-bottom: 6mm;
+      }
+      .sec h2 {
+        color: var(--acento);
+        font-size: 14.5pt;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+      }
+      .sec .rule {
+        width: 26mm;
+        height: 0.5mm;
+        background: var(--apoio);
+        margin: 2mm auto 0;
+      }
+
+      /* ── DOT LEADERS (nome ..... preço) ──────────────────────
+         O clássico do design de cardápio, resolvido com flex:
+         - nome e preço: white-space nowrap (tamanho natural)
+         - .dots no meio: flex:1 (ocupa TODO o espaço restante)
+           com border-bottom pontilhada
+         O pontilhado se ajusta sozinho a qualquer largura.      */
+      .row {
+        display: flex;
+        align-items: baseline; /* alinha pela linha de base do texto */
+        gap: 1.5mm;
+        margin-bottom: 3mm;
+      }
+      .nm {
+        font-size: 10.5pt;
+        font-weight: 700;
+        white-space: nowrap;
+      }
+      .dots {
+        flex: 1;
+        border-bottom: 0.3mm dotted rgba(0, 0, 0, 0.28);
+        transform: translateY(-1mm); /* alinha o pontilhado à base */
+        min-width: 4mm;
+      }
+      .pr {
+        font-size: 10.5pt;
+        font-weight: 800;
+        color: var(--acento);
+        white-space: nowrap;
+      }
+      .ds {
+        font-size: 7.5pt;
+        color: var(--tinta-suave);
+        margin: -2mm 0 3mm;
+      }
+
+      /* ── TELA: barra de instruções + "palco" ───────────────── */
+      .toolbar {
+        position: sticky;
+        top: 0;
+        background: #1c1c1c;
+        color: #eee;
+        padding: 10px 16px;
+        font-size: 13px;
+        display: flex;
+        gap: 14px;
+        align-items: center;
+        border-bottom: 2px solid var(--acento);
+      }
+      .toolbar button {
+        background: var(--acento);
+        color: #fff;
+        border: 0;
+        padding: 7px 14px;
+        border-radius: 6px;
+        font-weight: 700;
+        cursor: pointer;
+      }
+      .stage {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 18px;
+        padding: 24px 0 60px;
+      }
+      .stage .page {
+        box-shadow: 0 10px 34px rgba(0, 0, 0, 0.55); /* efeito folha */
+      }
+
+      /* ── IMPRESSÃO ───────────────────────────────────────────
+         @page controla a FOLHA (tamanho e margens do papel);
+         margin: 0 porque a margem já está dentro da .page.
+         Na hora de imprimir: Margens = Nenhuma, Escala = 100%.  */
+      @page {
+        size: 150mm 210mm;
+        margin: 0;
+      }
+
+      @media print {
+        body { background: #fff; }
+        .toolbar { display: none !important; } /* UI de tela some  */
+        .stage { display: block; padding: 0; }
+        .stage .page { box-shadow: none; }
+
+        /* Por padrão navegadores REMOVEM fundos coloridos ao
+           imprimir (economia de tinta). Para material gráfico,
+           forçamos a fidelidade:                                */
+        * {
+          -webkit-print-color-adjust: exact !important;
+          print-color-adjust: exact !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="toolbar">
+      <b>Estudo de Print CSS</b>
+      <span>Imprimir com: Margens = Nenhuma · Escala = 100%</span>
+      <button onclick="window.print()">Imprimir / Salvar PDF</button>
+    </div>
+
+    <div class="stage">
+      <!-- FOLHA 1: capa -->
+      <section class="page" style="align-items: center; justify-content: center; text-align: center">
+        <div>
+          <h1 style="font-size: 42pt; font-weight: 800; color: var(--acento); letter-spacing: 3px">
+            RESTAURANTE<br />MODELO
+          </h1>
+          <div class="sec" style="margin-top: 6mm">
+            <div class="rule" style="width: 56mm"></div>
+          </div>
+          <p style="font-size: 9pt; letter-spacing: 8px; text-transform: uppercase; color: var(--tinta-suave)">
+            Cardápio
+          </p>
+        </div>
+      </section>
+
+      <!-- FOLHA 2: itens com dot leaders -->
+      <section class="page">
+        <div class="sec"><h2>Lanches</h2><div class="rule"></div></div>
+
+        <div class="row">
+          <span class="nm">Lanche Clássico</span>
+          <span class="dots"></span>
+          <span class="pr">R$ 25</span>
+        </div>
+        <div class="ds">Descrição dos ingredientes do lanche.</div>
+
+        <div class="row">
+          <span class="nm">Lanche Completo</span>
+          <span class="dots"></span>
+          <span class="pr">R$ 33</span>
+        </div>
+        <div class="ds">Descrição dos ingredientes.</div>
+
+        <div class="sec" style="margin-top: 8mm"><h2>Bebidas</h2><div class="rule"></div></div>
+
+        <div class="row">
+          <span class="nm">Suco Natural</span>
+          <span class="dots"></span>
+          <span class="pr">R$ 10</span>
+        </div>
+        <div class="row">
+          <span class="nm">Refrigerante Lata</span>
+          <span class="dots"></span>
+          <span class="pr">R$ 6</span>
+        </div>
+      </section>
+    </div>
+  </body>
+</html>
