@@ -1,0 +1,9 @@
+# Dependências e resultados de build/clone — regeneráveis, nunca versionados.
+# A regra já estava escrita no README ("output/ ... não é versionado nem
+# republicado"), só faltava o arquivo que a faz valer.
+node_modules/
+
+# ShowRoom/lumion_final/clone.js baixa um site inteiro para estudo local
+# (fair-use educacional). São ~49 MB de assets de terceiros, incluindo vídeos
+# do CDN deles — não entram no repositório.
+output/

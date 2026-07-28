@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<!--
+  ============================================================================
+   index.html — Studio Template
+  ============================================================================
+
+   COMO RODAR:
+   -----------
+     Opção 1 (recomendada): VS Code + extensão "Live Server"
+       → Clique direito em index.html → "Open with Live Server"
+       → Abre em http://127.0.0.1:5500/ com auto-reload ao salvar.
+
+     Opção 2: terminal
+       → cd studio-template
+       → npx http-server -p 8000 -c-1
+       → Abrir http://localhost:8000
+
+     Opção 3: abrir o arquivo direto (file://)
+       → Funciona, mas alguns recursos (fetch, módulos) podem falhar por CORS.
+         Sempre prefira um servidor de verdade.
+
+   POR QUE NÃO FRAMEWORK?
+   ----------------------
+   Aqui o objetivo é APRENDER os padrões da web. Sem React/Vue/Next no caminho,
+   cada linha que você lê é o que o navegador realmente executa. Quando dominar
+   isso, qualquer framework fica simples — porque framework é só açúcar
+   por cima desses primitivos.
+
+   ESTRUTURA DESTE ARQUIVO:
+   ------------------------
+     <head>     metadados, favicon, CSS
+     <header>   navbar fixa
+     <main>     conteúdo (hero, features, split, stats)
+     <footer>   rodapé
+     <script>   carregado no fim para não bloquear render
+
+   ATRIBUTOS data-*
+   ----------------
+   Você vai ver atributos como data-reveal, data-reveal-delay, data-counter.
+   São hooks pro JavaScript: o JS procura elementos com esses atributos e
+   aplica comportamento. Vantagem: o HTML continua válido, e quem só lê
+   o markup vê claramente "esse elemento tem comportamento X".
+  ============================================================================
+-->
+<html lang="pt-BR">
+<head>
+  <!-- charset PRIMEIRO: navegador precisa saber o encoding antes de qualquer texto. -->
+  <meta charset="UTF-8" />
+
+  <!-- viewport: essencial para responsividade. width=device-width faz o site
+       usar a largura real do dispositivo (não a "largura simulada" antiga).
+       initial-scale=1 desativa zoom inicial automático em mobile. -->
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- color-scheme: avisa o browser que o site funciona em dark.
+       Faz scrollbars, form controls e outras UIs nativas usarem o tema escuro. -->
+  <meta name="color-scheme" content="dark" />
+
+  <meta name="description" content="Template educacional demonstrando padrões de site moderno: navbar fixa, hero animado, scroll reveal, grid de cards e rodapé responsivo." />
+
+  <title>Studio Template</title>
+
+  <!-- preload da CSS: avisa ao browser para baixar com prioridade alta. -->
+  <link rel="preload" href="styles.css" as="style" />
+  <link rel="stylesheet" href="styles.css" />
+
+  <!-- Favicon usando o mesmo SVG do logo. SVG escala para qualquer tamanho. -->
+  <link rel="icon" type="image/svg+xml" href="assets/logo.svg" />
+</head>
+
+<body>
+
+  <!-- ========================================================================
+       1. NAVBAR FIXA
+       ========================================================================
+       PADRÃO: começa transparente sobre o hero. Quando o usuário rola além
+       de N pixels, JS muda o atributo data-state para "solid" e o CSS aplica
+       background com blur (efeito "glassmorphism").
+
+       a11y: <header> e <nav> são landmarks — leitores de tela navegam por
+       eles direto.
+  -->
+  <header class="nav" id="topNav" data-state="transparent">
+    <a href="#hero" class="nav__brand" aria-label="Voltar ao topo">
+      <img src="assets/logo.svg" alt="" class="nav__logo" />
+      <span>Studio</span>
+    </a>
+
+    <nav aria-label="Menu principal">
+      <ul class="nav__menu" id="navMenu">
+        <li><a href="#features">Recursos</a></li>
+        <li><a href="#about">Sobre</a></li>
+        <li><a href="#stats">Números</a></li>
+        <li><a href="#contact">Contato</a></li>
+      </ul>
+    </nav>
+
+    <a class="btn btn--primary nav__cta" href="#contact">Comece agora</a>
+
+    <!-- Toggle de menu mobile. aria-controls aponta pro id do que ele controla.
+         aria-expanded é atualizado pelo JS para refletir o estado. -->
+    <button
+      class="nav__toggle"
+      id="navToggle"
+      aria-label="Abrir menu"
+      aria-controls="navMenu"
+      aria-expanded="false"
+    >
+      <span class="nav__toggle-bar" aria-hidden="true"></span>
+      <span class="nav__toggle-bar" aria-hidden="true"></span>
+      <span class="nav__toggle-bar" aria-hidden="true"></span>
+    </button>
+  </header>
+
+
+  <main>
+
+    <!-- ========================================================================
+         2. HERO
+         ========================================================================
+         PADRÃO: full-viewport, grande título centralizado, CTA dupla
+         (primária = ação principal, ghost = ação secundária).
+
+         O hero__bg é uma DIV com gradient animado em loop infinito. Em projeto
+         real você trocaria por <video autoplay muted playsinline loop>:
+
+           <video class="hero__bg" autoplay muted playsinline loop poster="...">
+             <source src="seu-video.mp4" type="video/mp4">
+           </video>
+
+         autoplay+muted+playsinline = a tríade necessária pra autoplay funcionar
+         em iOS e Android sem clique do usuário.
+
+         data-reveal: o JS adiciona .is-visible quando o elemento entra na
+         viewport. Aqui o hero está visível DESDE o load, então os reveals
+         disparam imediatamente (com delays escalonados pra criar cascata).
+    -->
+    <section class="hero" id="hero">
+      <div class="hero__bg" aria-hidden="true"></div>
+
+      <div class="hero__content">
+        <p class="hero__eyebrow" data-reveal>Lorem ipsum</p>
+        <h1 class="hero__title" data-reveal data-reveal-delay="120">
+          Lorem ipsum dolor.
+        </h1>
+        <p class="hero__subtitle" data-reveal data-reveal-delay="240">
+          Consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
+          labore et dolore magna aliqua.
+        </p>
+        <div class="hero__actions" data-reveal data-reveal-delay="360">
+          <a href="#features" class="btn btn--primary">Conhecer recursos</a>
+          <a href="#about" class="btn btn--ghost">Saiba mais</a>
+        </div>
+      </div>
+
+      <!-- Indicador visual de "role pra baixo". Animação CSS pura. -->
+      <div class="hero__scroll-hint" aria-hidden="true">
+        <span class="hero__scroll-line"></span>
+      </div>
+    </section>
+
+
+    <!-- ========================================================================
+         3. SEÇÃO DE RECURSOS — GRID DE CARDS
+         ========================================================================
+         Cada card tem data-reveal-delay diferente — efeito cascata na entrada.
+    -->
+    <section class="section" id="features" aria-labelledby="features-title">
+      <header class="section__header" data-reveal>
+        <p class="section__eyebrow">Recursos</p>
+        <h2 class="section__title" id="features-title">
+          Lorem ipsum dolor sit amet
+        </h2>
+        <p class="section__lead">
+          Consectetur adipiscing elit, sed do eiusmod tempor incididunt.
+        </p>
+      </header>
+
+      <div class="grid grid--3">
+        <article class="card" data-reveal>
+          <div class="card__media" aria-hidden="true"></div>
+          <h3 class="card__title">Lorem ipsum</h3>
+          <p class="card__body">
+            Consectetur adipiscing elit, sed do eiusmod tempor incididunt
+            ut labore et dolore.
+          </p>
+        </article>
+
+        <article class="card" data-reveal data-reveal-delay="120">
+          <div class="card__media" aria-hidden="true"></div>
+          <h3 class="card__title">Dolor sit amet</h3>
+          <p class="card__body">
+            Ut enim ad minim veniam, quis nostrud exercitation ullamco
+            laboris nisi ut aliquip.
+          </p>
+        </article>
+
+        <article class="card" data-reveal data-reveal-delay="240">
+          <div class="card__media" aria-hidden="true"></div>
+          <h3 class="card__title">Consectetur</h3>
+          <p class="card__body">
+            Duis aute irure dolor in reprehenderit in voluptate velit esse
+            cillum dolore eu fugiat.
+          </p>
+        </article>
+      </div>
+    </section>
+
+
+    <!-- ========================================================================
+         4. SEÇÃO SPLIT — TEXTO + MÍDIA LADO A LADO
+         ========================================================================
+         Em mobile vira coluna única (CSS grid auto-fold).
+    -->
+    <section class="section split" id="about" aria-labelledby="about-title">
+      <div class="split__text" data-reveal>
+        <p class="section__eyebrow">Sobre</p>
+        <h2 class="section__title" id="about-title">
+          Lorem ipsum dolor sit
+        </h2>
+        <p>
+          Consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
+          labore et dolore magna aliqua. Ut enim ad minim veniam.
+        </p>
+        <p>
+          Duis aute irure dolor in reprehenderit in voluptate velit esse
+          cillum dolore eu fugiat nulla pariatur.
+        </p>
+        <a href="#contact" class="btn btn--primary">Entrar em contato</a>
+      </div>
+
+      <div class="split__media" data-reveal data-reveal-delay="200" aria-hidden="true">
+        <!-- Aqui você colocaria <img> ou <video>. Por enquanto é uma DIV
+             estilizada com gradient — placeholder visual. -->
+      </div>
+    </section>
+
+
+    <!-- ========================================================================
+         5. STATS — NÚMEROS ANIMADOS
+         ========================================================================
+         data-counter contém o valor final. JS observa o elemento com
+         IntersectionObserver e quando entra na tela, anima de 0 ao alvo.
+    -->
+    <section class="section stats" id="stats" aria-labelledby="stats-title">
+      <h2 class="section__title sr-only" id="stats-title">Números</h2>
+      <ul class="stats__list">
+        <li class="stat" data-reveal>
+          <span class="stat__num" data-counter="2400">0</span>
+          <span class="stat__suffix">+</span>
+          <span class="stat__label">Lorem ipsum</span>
+        </li>
+        <li class="stat" data-reveal data-reveal-delay="120">
+          <span class="stat__num" data-counter="98">0</span>
+          <span class="stat__suffix">%</span>
+          <span class="stat__label">Dolor sit amet</span>
+        </li>
+        <li class="stat" data-reveal data-reveal-delay="240">
+          <span class="stat__num" data-counter="156">0</span>
+          <span class="stat__suffix">k</span>
+          <span class="stat__label">Adipiscing elit</span>
+        </li>
+      </ul>
+    </section>
+
+  </main>
+
+
+  <!-- ========================================================================
+       6. RODAPÉ
+       ========================================================================
+  -->
+  <footer class="footer" id="contact">
+    <div class="footer__cols">
+      <div>
+        <a href="#hero" class="footer__brand">
+          <img src="assets/logo.svg" alt="" />
+          <span>Studio</span>
+        </a>
+        <p class="footer__tagline">Lorem ipsum dolor sit amet.</p>
+      </div>
+
+      <div>
+        <h4>Lorem</h4>
+        <ul>
+          <li><a href="#">Lorem ipsum</a></li>
+          <li><a href="#">Dolor sit</a></li>
+          <li><a href="#">Amet consectetur</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h4>Ipsum</h4>
+        <ul>
+          <li><a href="#">Adipiscing elit</a></li>
+          <li><a href="#">Sed do eiusmod</a></li>
+          <li><a href="#">Tempor incididunt</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h4>Dolor</h4>
+        <ul>
+          <li><a href="#">Ut labore</a></li>
+          <li><a href="#">Et dolore</a></li>
+          <li><a href="#">Magna aliqua</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <p class="footer__bottom">
+      © 2026 Studio Template — código educacional original.
+    </p>
+  </footer>
+
+
+  <!-- Script no FIM do <body>: garante que o DOM já existe quando o JS roda.
+       Sem 'defer' aqui porque é um script clássico e não tem 'type="module"'.
+       Em projetos com modules, prefira: <script type="module" src="..."></script>
+       no <head> com defer implícito. -->
+  <script src="script.js"></script>
+</body>
+</html>

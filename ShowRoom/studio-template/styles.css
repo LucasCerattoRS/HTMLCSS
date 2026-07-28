@@ -1,0 +1,757 @@
+/* ============================================================================
+ * styles.css — Studio Template
+ * ============================================================================
+ *
+ * ORGANIZAÇÃO (na ordem em que aparecem):
+ *   1. CSS custom properties (variáveis)
+ *   2. Reset mínimo
+ *   3. Base (typography, body)
+ *   4. Utilities (.container, .btn, .sr-only)
+ *   5. Componentes:
+ *        5.1  Navbar
+ *        5.2  Hero
+ *        5.3  Sections (header genérico)
+ *        5.4  Grid de cards
+ *        5.5  Split (texto + mídia)
+ *        5.6  Stats
+ *        5.7  Footer
+ *   6. Reveal animations (data-reveal)
+ *
+ * ESTRATÉGIA: mobile-first.
+ * --------------------------
+ * Estilos no nível raiz são pra mobile. Media queries com (min-width: ...)
+ * adicionam regras pra telas maiores. Vantagens:
+ *   - Menos CSS no caminho crítico mobile
+ *   - Override só onde necessário (regras desktop são "extras", não substituições)
+ *   - Pensa primeiro no caso restritivo (tela pequena), expande depois
+ *
+ * BEM-LIKE NAMING
+ * ---------------
+ * .bloco__elemento--modificador
+ *   .nav            → bloco
+ *   .nav__menu      → elemento dentro do bloco
+ *   .btn--primary   → modificador do bloco
+ * Reduz colisões e deixa óbvio onde cada classe pertence.
+ * ========================================================================== */
+
+
+/* ============================================================================
+ * 1. CSS CUSTOM PROPERTIES
+ * ============================================================================
+ *
+ * Custom properties (variáveis CSS) são definidas com -- e lidas com var(--x).
+ * Vivem no DOM, podem ser sobrescritas em qualquer escopo, e respondem ao
+ * cálculo do browser em tempo real (diferente de variáveis Sass que somem
+ * na compilação).
+ *
+ * USO TÍPICO: tokens de design (cores, espaçamento, tipografia). Trocar uma
+ * cor em :root muda em todo o site.
+ * ========================================================================== */
+:root {
+  /* --- Paleta --- */
+  --color-bg:           #0e1a2b;   /* fundo principal (azul-petróleo escuro)  */
+  --color-surface:      #18243a;   /* cards, footer (um degrau mais claro)     */
+  --color-surface-2:    #1f2f48;   /* hover state                              */
+  --color-text:         #e8eef5;   /* texto principal (off-white quente)       */
+  --color-text-muted:   #9aafc4;   /* texto secundário, descrições             */
+  --color-accent:       #4d8fe8;   /* azul de destaque (CTAs, eyebrows)        */
+  --color-accent-hover: #6aa3f0;
+  --color-border:       rgba(255, 255, 255, 0.08);
+  --color-border-hover: rgba(255, 255, 255, 0.16);
+
+  /* --- Espaçamento ---
+   * Escala consistente em rem. 1rem = 16px por padrão; usar rem em vez de px
+   * faz o site escalar quando usuário aumenta tamanho de fonte do browser. */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 1rem;
+  --space-4: 1.5rem;
+  --space-5: 2rem;
+  --space-6: 3rem;
+  --space-7: 5rem;
+  --space-8: 7rem;
+
+  /* --- Tipografia ---
+   * "system-ui" usa a fonte do sistema operacional do usuário. Resultado:
+   * zero kilobytes de download, e o site se sente nativo em cada plataforma.
+   * Em produção real você adicionaria uma fonte web custom (Inter, Geist...). */
+  --font-sans: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI',
+               Roboto, 'Helvetica Neue', Arial, sans-serif;
+
+  /* clamp(min, fluid, max) = tipografia fluida.
+   * O título do hero acompanha a viewport: cresce com a tela mas tem teto.
+   * Sem media queries pra cada breakpoint — uma linha resolve. */
+  --text-sm:    0.875rem;
+  --text-base:  1rem;
+  --text-lg:    1.125rem;
+  --text-xl:    1.5rem;
+  --text-2xl:   2rem;
+  --text-3xl:   clamp(2rem, 3vw + 1rem, 3rem);
+  --text-hero:  clamp(2.5rem, 5vw + 1rem, 5.5rem);
+
+  /* --- Layout --- */
+  --max-width:      1200px;
+  --nav-height:     72px;
+  --radius-sm:      8px;
+  --radius-md:      16px;
+  --radius-pill:    999px;
+
+  /* --- Animação ---
+   * cubic-bezier(0.16, 1, 0.3, 1) é "ease-out-expo": muito rápido no início,
+   * desacelera de forma orgânica. Sensação de "snap" sem ser brusco. */
+  --ease-out:        cubic-bezier(0.16, 1, 0.3, 1);
+  --duration-fast:   200ms;
+  --duration-normal: 400ms;
+  --duration-slow:   800ms;
+
+  /* Sombras sutis para elevação. Múltiplas camadas dão profundidade real. */
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.25),
+               0 1px 3px rgba(0, 0, 0, 0.15);
+}
+
+
+/* ============================================================================
+ * 2. RESET MÍNIMO
+ * ============================================================================
+ *
+ * Diferente de "reset completo" (Eric Meyer) ou "Normalize" (Necolas Gallagher),
+ * aqui só zeramos o que mais costuma quebrar layout. Suficiente pra projetos
+ * pequenos — em produção use Normalize ou Tailwind preflight.
+ * ========================================================================== */
+
+/* box-sizing border-box: padding e border NÃO somam à largura.
+ * Width=200px com padding=20px continua medindo 200px. Vida muito mais fácil. */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+/* RESPEITO À PREFERÊNCIA DO USUÁRIO:
+ * Quem ativa "reduzir movimento" no SO (acessibilidade) tem animações
+ * praticamente desligadas. NUNCA ignore essa media query — animações em
+ * excesso podem causar enjoo em pessoas com vestibular sensitivity. */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *,
+  *::before,
+  *::after {
+    animation-duration:    0.01ms !important;
+    animation-iteration-count: 1   !important;
+    transition-duration:   0.01ms !important;
+    scroll-behavior:       auto    !important;
+  }
+}
+
+body {
+  font-family: var(--font-sans);
+  font-size: var(--text-base);
+  line-height: 1.5;
+  color: var(--color-text);
+  background: var(--color-bg);
+  /* Antialiasing diferente em cada plataforma — esses dois ajustam pra ficar
+   * mais "fino" e consistente. */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  /* Bloqueia scroll horizontal acidental causado por elementos overflow. */
+  overflow-x: hidden;
+}
+
+/* Mídia: bloco e fluida por padrão. Evita gap fantasma debaixo de <img>. */
+img, svg, video {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+ul {
+  list-style: none;
+}
+
+/* Links herdam cor — assim controlamos cor pelo contexto e não global. */
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* Botões nativos vêm com fonte e cor herdadas das defaults do browser.
+ * Forçamos o herding do body pra garantir consistência. */
+button {
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  background: none;
+  border: none;
+}
+
+/* Heading defaults — peso 700 e line-height curta. */
+h1, h2, h3, h4 {
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+}
+
+
+/* ============================================================================
+ * 3. UTILITIES
+ * ========================================================================== */
+
+/* .container — centraliza conteúdo até max-width, com padding nas laterais.
+ * Usado dentro de seções pra evitar que texto cole nas bordas em mobile. */
+.container {
+  width: 100%;
+  max-width: var(--max-width);
+  margin-inline: auto;             /* atalho moderno: margin-left + margin-right */
+  padding-inline: var(--space-3);
+}
+
+/* .btn — base. Variações via modificadores. */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: 0.75rem 1.5rem;
+  border: 1px solid transparent;
+  border-radius: var(--radius-pill);
+  font-weight: 600;
+  font-size: var(--text-sm);
+  cursor: pointer;
+  user-select: none;
+  /* Trans em múltiplas props ao mesmo tempo. */
+  transition: background var(--duration-fast) var(--ease-out),
+              border-color var(--duration-fast) var(--ease-out),
+              transform var(--duration-fast) var(--ease-out),
+              color var(--duration-fast) var(--ease-out);
+}
+.btn--primary {
+  background: var(--color-accent);
+  color: white;
+}
+.btn--primary:hover {
+  background: var(--color-accent-hover);
+  transform: translateY(-1px);
+}
+.btn--ghost {
+  background: transparent;
+  border-color: var(--color-text-muted);
+  color: var(--color-text);
+}
+.btn--ghost:hover {
+  border-color: var(--color-text);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+/* Foco visível para teclado — acessibilidade.
+ * :focus-visible só dispara quando navegação é via teclado, não mouse. */
+.btn:focus-visible,
+.nav__menu a:focus-visible,
+.nav__toggle:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 3px;
+}
+
+/* .sr-only — esconde visualmente mas mantém pra leitores de tela.
+ * Útil para títulos de seção que devem existir na hierarquia mas não aparecer. */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+
+/* ============================================================================
+ * 5.1 NAVBAR
+ * ============================================================================
+ *
+ * PADRÃO "TRANSPARENT-TO-SOLID":
+ * Navbar começa transparente sobre o hero, vira sólida ao rolar. JS troca
+ * data-state, CSS responde com transition. backdrop-filter: blur(...) é o
+ * efeito glassmorphism — só funciona em browsers modernos (95%+ support hoje).
+ * ========================================================================== */
+.nav {
+  position: fixed;
+  top: 0;
+  inset-inline: 0;                    /* atalho: left:0; right:0 */
+  height: var(--nav-height);
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding-inline: var(--space-4);
+  z-index: 100;
+
+  background: transparent;
+  border-bottom: 1px solid transparent;
+  transition: background var(--duration-normal) var(--ease-out),
+              backdrop-filter var(--duration-normal) var(--ease-out),
+              border-color var(--duration-normal) var(--ease-out);
+}
+.nav[data-state="solid"] {
+  background: rgba(14, 26, 43, 0.78);
+  /* O blur cria o efeito vidro fosco — exige saturate pra cores não morrerem. */
+  backdrop-filter: saturate(180%) blur(14px);
+  -webkit-backdrop-filter: saturate(180%) blur(14px);  /* Safari */
+  border-bottom-color: var(--color-border);
+}
+
+.nav__brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-weight: 700;
+  font-size: var(--text-lg);
+  /* margin-right: auto manda os irmãos pro fim do flex container.
+   * Equivalente a "spacer flexível". */
+  margin-right: auto;
+}
+.nav__logo {
+  width: 32px;
+  height: 32px;
+}
+
+.nav__menu {
+  display: none;       /* mobile: escondido até toggle abrir */
+  gap: var(--space-5);
+}
+.nav__menu a {
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+  transition: color var(--duration-fast) var(--ease-out);
+}
+.nav__menu a:hover {
+  color: var(--color-text);
+}
+
+.nav__cta {
+  display: none;       /* mobile: hambúrguer no lugar */
+}
+
+/* Toggle hambúrguer — 3 barras CSS, sem ícone externo.
+ * Quando aberto, animamos as barras pra virar X. */
+.nav__toggle {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: var(--space-2);
+}
+.nav__toggle-bar {
+  display: block;
+  width: 24px;
+  height: 2px;
+  background: var(--color-text);
+  transition: transform var(--duration-fast) var(--ease-out),
+              opacity var(--duration-fast) var(--ease-out);
+}
+.nav__menu.is-open ~ .nav__toggle .nav__toggle-bar:nth-child(1),
+.nav__toggle[aria-expanded="true"] .nav__toggle-bar:nth-child(1) {
+  transform: translateY(7px) rotate(45deg);
+}
+.nav__toggle[aria-expanded="true"] .nav__toggle-bar:nth-child(2) {
+  opacity: 0;
+}
+.nav__toggle[aria-expanded="true"] .nav__toggle-bar:nth-child(3) {
+  transform: translateY(-7px) rotate(-45deg);
+}
+
+/* Mobile menu aberto: overlay vertical embaixo da nav. */
+.nav__menu.is-open {
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  top: var(--nav-height);
+  inset-inline: 0;
+  padding: var(--space-4);
+  background: var(--color-bg);
+  border-bottom: 1px solid var(--color-border);
+  gap: var(--space-3);
+}
+
+/* DESKTOP: 768px+ */
+@media (min-width: 768px) {
+  .nav { padding-inline: var(--space-5); }
+  .nav__menu { display: flex; }
+  .nav__cta { display: inline-flex; }
+  .nav__toggle { display: none; }
+}
+
+
+/* ============================================================================
+ * 5.2 HERO
+ * ============================================================================
+ * Background animado: gradiente em diagonal que desliza em loop.
+ * Trocar por <video> em produção é direto — só ajustar object-fit:cover.
+ * ========================================================================== */
+.hero {
+  position: relative;
+  /* min-height usa dvh em vez de vh.
+   * dvh = dynamic viewport height. Em mobile, considera a barra de URL que
+   * aparece/some — assim o hero não fica "cortado" quando a barra recolhe. */
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  padding: var(--nav-height) var(--space-4) var(--space-7);
+  overflow: hidden;
+}
+
+.hero__bg {
+  position: absolute;
+  inset: 0;          /* atalho: top:0; right:0; bottom:0; left:0 */
+  z-index: 0;
+  background: linear-gradient(135deg,
+    #1a3055 0%,
+    #2c4d80 25%,
+    #4d8fe8 50%,
+    #2c4d80 75%,
+    #1a3055 100%);
+  /* 400% × 400% dá margem pra animar a posição sem mostrar borda. */
+  background-size: 400% 400%;
+  animation: heroBgShift 18s ease-in-out infinite;
+}
+
+/* Vinheta sutil — escurece bordas pra texto ter mais contraste. */
+.hero::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: radial-gradient(
+    ellipse at center,
+    transparent 30%,
+    rgba(14, 26, 43, 0.6) 100%);
+  pointer-events: none;
+}
+
+.hero__content {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  max-width: 800px;
+}
+.hero__eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  font-size: var(--text-sm);
+  color: var(--color-accent);
+  margin-bottom: var(--space-3);
+  font-weight: 600;
+}
+.hero__title {
+  font-size: var(--text-hero);
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  margin-bottom: var(--space-4);
+}
+.hero__subtitle {
+  font-size: var(--text-lg);
+  color: var(--color-text-muted);
+  margin-bottom: var(--space-5);
+  max-width: 600px;
+  margin-inline: auto;
+}
+.hero__actions {
+  display: flex;
+  gap: var(--space-3);
+  justify-content: center;
+  flex-wrap: wrap;        /* em telas estreitas os botões empilham */
+}
+
+/* Indicador "role pra baixo" — linha caindo */
+.hero__scroll-hint {
+  position: absolute;
+  bottom: var(--space-4);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2;
+  height: 40px;
+  width: 2px;
+  overflow: hidden;
+}
+.hero__scroll-line {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(to bottom, transparent, var(--color-text));
+  animation: scrollHintSlide 2.5s ease-in-out infinite;
+}
+
+@keyframes heroBgShift {
+  0%, 100% { background-position: 0% 50%; }
+  50%      { background-position: 100% 50%; }
+}
+@keyframes scrollHintSlide {
+  0%   { transform: translateY(-100%); }
+  100% { transform: translateY(100%); }
+}
+
+
+/* ============================================================================
+ * 5.3 SECTIONS — HEADER GENÉRICO
+ * ========================================================================== */
+.section {
+  padding: var(--space-7) var(--space-3);
+  max-width: var(--max-width);
+  margin-inline: auto;
+}
+.section__header {
+  text-align: center;
+  margin-bottom: var(--space-6);
+  max-width: 700px;
+  margin-inline: auto;
+}
+.section__eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  font-size: var(--text-sm);
+  color: var(--color-accent);
+  margin-bottom: var(--space-2);
+  font-weight: 600;
+}
+.section__title {
+  font-size: var(--text-3xl);
+  margin-bottom: var(--space-3);
+}
+.section__lead {
+  color: var(--color-text-muted);
+  font-size: var(--text-lg);
+}
+
+
+/* ============================================================================
+ * 5.4 GRID DE CARDS
+ * ============================================================================
+ * grid-template-columns muda no breakpoint.
+ * gap controla o espaço entre cards (substitui margin entre filhos). */
+.grid {
+  display: grid;
+  gap: var(--space-4);
+  grid-template-columns: 1fr;     /* mobile: 1 coluna */
+}
+@media (min-width: 640px) {
+  .grid--3 { grid-template-columns: repeat(2, 1fr); }
+}
+@media (min-width: 960px) {
+  .grid--3 { grid-template-columns: repeat(3, 1fr); }
+}
+
+.card {
+  padding: var(--space-4);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  transition: transform var(--duration-fast) var(--ease-out),
+              border-color var(--duration-fast) var(--ease-out),
+              background var(--duration-fast) var(--ease-out);
+}
+.card:hover {
+  transform: translateY(-4px);
+  border-color: var(--color-border-hover);
+  background: var(--color-surface-2);
+}
+.card__media {
+  aspect-ratio: 16 / 9;
+  border-radius: var(--radius-sm);
+  margin-bottom: var(--space-3);
+  background: linear-gradient(135deg, #2c4d80, #4d8fe8);
+  /* Animar background-position cria efeito de "movimento" sutil. */
+  background-size: 200% 200%;
+  animation: cardMediaShift 8s ease-in-out infinite;
+}
+.card__title {
+  font-size: var(--text-xl);
+  margin-bottom: var(--space-2);
+}
+.card__body {
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+}
+
+@keyframes cardMediaShift {
+  0%, 100% { background-position: 0% 50%; }
+  50%      { background-position: 100% 50%; }
+}
+
+
+/* ============================================================================
+ * 5.5 SPLIT — TEXTO + MÍDIA LADO A LADO
+ * ========================================================================== */
+.split {
+  display: grid;
+  gap: var(--space-5);
+  align-items: center;
+  grid-template-columns: 1fr;     /* mobile: empilhado */
+}
+@media (min-width: 768px) {
+  .split {
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-7);
+  }
+}
+
+/* "Lobotomized owl" selector: > * + * aplica em todo elemento que tem irmão
+ * antes. Adiciona espaço VERTICAL entre filhos sequenciais sem precisar de
+ * margem repetida em cada parágrafo. */
+.split__text > * + * {
+  margin-top: var(--space-3);
+}
+
+.split__media {
+  aspect-ratio: 4 / 3;
+  border-radius: var(--radius-md);
+  background: linear-gradient(135deg, #18243a 0%, #2c4d80 50%, #4d8fe8 100%);
+  background-size: 200% 200%;
+  animation: cardMediaShift 12s ease-in-out infinite;
+  box-shadow: var(--shadow-md);
+}
+
+
+/* ============================================================================
+ * 5.6 STATS
+ * ========================================================================== */
+.stats {
+  text-align: center;
+}
+.stats__list {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-5);
+}
+@media (min-width: 640px) {
+  .stats__list { grid-template-columns: repeat(3, 1fr); }
+}
+.stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+}
+.stat__num {
+  font-size: var(--text-3xl);
+  font-weight: 800;
+  color: var(--color-accent);
+  line-height: 1;
+  font-variant-numeric: tabular-nums;  /* dígitos com largura fixa: contador
+                                          não "pula" enquanto anima */
+}
+.stat__suffix {
+  font-size: var(--text-xl);
+  color: var(--color-accent);
+  margin-top: -8px;     /* aproxima do número, fica grudado */
+}
+.stat__label {
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+  margin-top: var(--space-2);
+}
+
+
+/* ============================================================================
+ * 5.7 FOOTER
+ * ========================================================================== */
+.footer {
+  background: var(--color-surface);
+  padding: var(--space-7) var(--space-3) var(--space-4);
+  border-top: 1px solid var(--color-border);
+  margin-top: var(--space-7);
+}
+.footer__cols {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-5);
+  max-width: var(--max-width);
+  margin-inline: auto;
+  margin-bottom: var(--space-6);
+}
+@media (min-width: 640px) {
+  .footer__cols { grid-template-columns: repeat(2, 1fr); }
+}
+@media (min-width: 960px) {
+  .footer__cols { grid-template-columns: 2fr 1fr 1fr 1fr; }
+}
+.footer__brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-weight: 700;
+  font-size: var(--text-lg);
+  margin-bottom: var(--space-3);
+}
+.footer__brand img {
+  width: 28px;
+  height: 28px;
+}
+.footer__tagline {
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+  max-width: 280px;
+}
+.footer h4 {
+  font-size: var(--text-sm);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: var(--space-3);
+}
+.footer ul li + li {
+  margin-top: var(--space-2);
+}
+.footer a {
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+  transition: color var(--duration-fast);
+}
+.footer a:hover {
+  color: var(--color-text);
+}
+.footer__bottom {
+  text-align: center;
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--color-border);
+  max-width: var(--max-width);
+  margin-inline: auto;
+}
+
+
+/* ============================================================================
+ * 6. REVEAL ANIMATIONS — data-reveal
+ * ============================================================================
+ *
+ * COMO FUNCIONA:
+ *   - HTML marca elementos com [data-reveal]
+ *   - CSS abaixo deixa eles invisíveis (opacity:0) e deslocados (translateY)
+ *   - Quando JS adiciona .is-visible, transition leva ao estado final
+ *   - data-reveal-delay (no HTML) controla atraso individual via JS
+ *
+ * POR QUE NÃO USAR @keyframes?
+ * Keyframes rodam assim que o elemento existe no DOM. Aqui queremos animar
+ * SÓ quando o elemento entra na viewport. Por isso:
+ *   estado inicial em CSS (sempre)  +  classe disparadora via JS = controle preciso
+ * ========================================================================== */
+[data-reveal] {
+  opacity: 0;
+  transform: translateY(32px);
+  transition: opacity var(--duration-slow) var(--ease-out),
+              transform var(--duration-slow) var(--ease-out);
+  /* will-change avisa o browser pra preparar a camada de composição.
+   * Use com moderação — em excesso desperdiça memória GPU. */
+  will-change: opacity, transform;
+}
+[data-reveal].is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Após a animação, libera will-change pra liberar memória.
+ * Truque: classe .is-visible + transition = evento transitionend, mas
+ * mais simples: deixa o will-change. Em sites pequenos não é problema. */

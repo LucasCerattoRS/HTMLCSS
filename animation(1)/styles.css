@@ -1,0 +1,53 @@
+body {
+    margin: 0;
+}
+
+.sky {
+    background: #0f0f1b;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.bat {
+    width: 1px;
+    height: 1px;
+    background: transparent;
+    transform: scale(8); /* Escala gigante do pixel que você pediu */
+    animation: fly 0.5s steps(1) infinite, 
+               float 2s ease-in-out infinite;
+}
+
+@keyframes fly {
+    /* Frame 0% - Asas para Cima */
+    0%, 100% {
+        box-shadow: 
+        2px 0 #000, 3px 0 #000, 8px 0 #000, 9px 0 #000,
+        1px 1px #000, 2px 1px #000, 3px 1px #000, 4px 1px #000, 7px 1px #000, 8px 1px #000, 9px 1px #000, 10px 1px #000,
+        0px 2px #000, 1px 2px #000, 2px 2px #000, 3px 2px #000, 4px 2px #000, 5px 2px #000, 6px 2px #000, 7px 2px #000, 8px 2px #000, 9px 2px #000, 10px 2px #000, 11px 2px #000,
+        1px 3px #000, 2px 3px #000, 3px 3px #000, 4px 3px #000, 5px 3px #000, 6px 3px #000, 7px 3px #000, 8px 3px #000, 9px 3px #000, 10px 3px #000,
+        2px 4px #000, 3px 4px #000, 4px 4px #000, 5px 4px #000, 6px 4px #000, 7px 4px #000, 8px 4px #000, 9px 4px #000,
+        3px 5px #000, 4px 5px #000, 5px 5px #000, 6px 5px #000, 7px 5px #000, 8px 5px #000,
+        4px 6px #000, 5px 6px #000, 6px 6px #000, 7px 6px #000,
+        5px 7px #000, 6px 7px #000;
+    }
+
+    /* Frame 50% - Asas para Baixo */
+    50% {
+        box-shadow: 
+        0px 0px #000, 1px 0px #000, 2px 0px #000, 3px 0px #000, 4px 0px #000, 5px 0px #000, 6px 0px #000, 7px 0px #000, 8px 0px #000, 9px 0px #000, 10px 0px #000, 11px 0px #000,
+        1px 1px #000, 2px 1px #000, 3px 1px #000, 4px 1px #000, 5px 1px #000, 6px 1px #000, 7px 1px #000, 8px 1px #000, 9px 1px #000, 10px 1px #000,
+        2px 2px #000, 3px 2px #000, 4px 2px #000, 5px 2px #000, 6px 2px #000, 7px 2px #000, 8px 2px #000, 9px 2px #000,
+        3px 3px #000, 4px 3px #000, 5px 3px #000, 6px 3px #000, 7px 3px #000, 8px 3px #000,
+        2px 4px #000, 3px 4px #000, 5px 4px #000, 6px 4px #000, 8px 4px #000, 9px 4px #000,
+        2px 5px #000, 5px 5px #000, 6px 5px #000, 9px 5px #000,
+        5px 6px #000, 6px 6px #000;
+    }
+}
+
+/* Efeito de flutuar verticalmente */
+@keyframes float {
+    0%, 100% { transform: scale(8) translateY(0); }
+    50% { transform: scale(8) translateY(-2px); }
+}

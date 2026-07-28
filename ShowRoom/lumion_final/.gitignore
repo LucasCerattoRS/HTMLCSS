@@ -1,0 +1,14 @@
+# Dependências (reinstaláveis com `npm install`)
+node_modules/
+
+# Saída do clone (gerada por `npm run clone` — pesada, ~50 MB; não versionar)
+output/
+
+# Screenshots de teste gerados por test_render.js
+snap_top.png
+snap_mid.png
+snap_bottom.png
+
+# Logs / artefatos do Playwright
+playwright-report/
+test-results/

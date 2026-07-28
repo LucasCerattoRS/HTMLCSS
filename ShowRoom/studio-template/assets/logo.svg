@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" role="img" aria-label="Studio logo">
+  <!-- Logo abstrato: quadrado arredondado com forma geométrica em V invertido. -->
+  <rect width="40" height="40" rx="10" fill="#4d8fe8"/>
+  <path d="M11 12 L20 28 L29 12 L25 12 L20 22 L15 12 Z" fill="#ffffff"/>
+</svg>

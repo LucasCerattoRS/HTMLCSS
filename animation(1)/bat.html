@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Morcego Pixel Art - Idêntico ao Vídeo</title>
+    <style>
+        body {
+            /* Cor de fundo cinza clara idêntica ao vídeo */
+            background-color: #d1d1d1; 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        .bat {
+            width: 1px;
+            height: 1px;
+            background: transparent;
+            /* Aumente ou diminua o 6 para mudar o tamanho geral do morcego */
+            transform: scale(6); 
+            
+            /* Animação seca de 0.4s (bate a asa rápido como no vídeo) */
+            animation: fly 0.4s steps(1) infinite;
+            
+            /* Ajuste para centralizar o desenho na tela */
+            margin-left: -100px;
+            margin-top: -100px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="bat"></div>
+
+    <script>
+        /* =================================================================
+           MOTOR DE PIXEL ART
+           'X' = Pixel do corpo do morcego
+           'O' = Pixel do olho (branco)
+           ' ' = Espaço vazio
+           ================================================================= */
+
+        // FRAME 1: Asas para CIMA (Formato de lua crescente)
+        const frameUp = [
+            "                                      ",
+            "               XX        XX           ",
+            "              XXXX      XXXX          ",
+            "    XX       XXXXXX    XXXXXX         ",
+            "            XXXXXXXXXXXXXXXXXX    XX  ",
+            "           XXXXXXXXXXXXXXXXXXXX       ",
+            "     X     XXXXXXXXXXXXXXXXXXXX     X ",
+            "           XXXXXXXXXXXXXXXXXXXX       ",
+            "    XX      XXXXX  OO  OO  XXXX       ",
+            "            XXXXXXXXXXXXXXXXXX   XX   ",
+            "             XXXXXXXXXXXXXXXX         ",
+            "      X       XXXX      XXXX          ",
+            "               XX        XX           ",
+            "                                      "
+        ];
+
+        // FRAME 2: Asas para BAIXO (Morcego se abraçando)
+        const frameDown = [
+            "                                      ",
+            "                XXXXXX                ",
+            "               XXXXXXXX               ",
+            "    XX        XXXXXXXXXX              ",
+            "              XXXX OO XXX         XX  ",
+            "             XXXXXXXXXXXX             ",
+            "     X      XXXXXXXXXXXXXX          X ",
+            "            XXXXXXXXXXXXXX            ",
+            "    XX      XXXXXXXXXXXXXX       XX   ",
+            "            XXXXX    XXXXX            ",
+            "             XXX      XXX             ",
+            "      X       X        X              ",
+            "                                      ",
+            "                                      "
+        ];
+
+        // Converte o desenho de texto para coordenadas CSS reais
+        function buildShadow(matrix) {
+            let shadows = [];
+            for (let y = 0; y < matrix.length; y++) {
+                for (let x = 0; x < matrix[y].length; x++) {
+                    if (matrix[y][x] === 'X') {
+                        shadows.push(`${x}px ${y}px #2a2a2a`); // Cor escura do corpo
+                    } else if (matrix[y][x] === 'O') {
+                        shadows.push(`${x}px ${y}px #ffffff`); // Cor branca dos olhos
+                    }
+                }
+            }
+            return shadows.join(', ');
+        }
+
+        // Injeta a animação perfeita no CSS da página
+        const style = document.createElement('style');
+        style.innerHTML = `
+            @keyframes fly {
+                0%, 100% { box-shadow: ${buildShadow(frameUp)}; }
+                50% { box-shadow: ${buildShadow(frameDown)}; }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

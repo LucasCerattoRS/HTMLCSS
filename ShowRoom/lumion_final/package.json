@@ -1,0 +1,14 @@
+{
+  "name": "lumion-clone",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Clone fair-use (uso educacional) da homepage de lumion.com usando Playwright. Captura HTML SSR original + chunks Next.js + assets estáticos + vídeos.",
+  "scripts": {
+    "clone": "node clone.js",
+    "serve": "npx --yes http-server output/lumion.com -p 8080 -c-1",
+    "test": "node test_render.js"
+  },
+  "dependencies": {
+    "playwright": "^1.59.1"
+  }
+}
