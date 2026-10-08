@@ -8,7 +8,7 @@ Repositório com meus exercícios de fundamentos e projetos práticos de HTML e 
 ├── basic(1)/          Fundamentos: tags, semântica, primeiros layouts
 ├── basic(2)/          Continuação: box model, posicionamento, responsividade
 ├── animation(1)/      Estudo de animação CSS (keyframes, transitions)
-├── login/             Tela de login com validação básica em JavaScript
+├── login/             Tela de login animada com GSAP (bonecos que seguem o mouse; sem validação)
 ├── ShowRoom/          Estudos avançados
 │   ├── lumion_final/      Crawler em Playwright (Node) para clonar SPAs
 │   └── studio-template/   Template de site marketing escrito do zero
@@ -25,6 +25,7 @@ Repositório com meus exercícios de fundamentos e projetos práticos de HTML e 
 
 | Projeto | Conceitos praticados |
 |---|---|
+| **login** | GSAP (`timeline`, `quickTo`, `stagger`), eventos `focus`/`blur`, ordem `mousedown` → `blur` → `click` |
 | **animation-car** | `@keyframes`, `transform`, timing functions |
 | **cafe-website** | Layout de landing page, tipografia, hero section |
 | **cardapio-digital** | Mobile-first, `clamp()`, scroll-snap, sticky nav, filtro com data-attributes, `@page`/Print CSS, acessibilidade (`focus-visible`, `prefers-reduced-motion`) |
@@ -62,3 +63,41 @@ npm run serve     # abre o clone localmente
   só o código do crawler entra aqui.
 - As imagens foram comprimidas para carregamento rápido sem perda visual perceptível.
 - O `cardapio-digital/` é a versão didática e **anonimizada** de um projeto real vendido a um restaurante: dados do cliente (nome, telefone, fotos, preços) foram trocados por placeholders — o estudo preserva a técnica, comentada linha a linha. Inclui `impressao.html` dedicado a Print CSS (`@page`, unidades `mm`/`pt`, dot leaders, `print-color-adjust`).
+
+## ✅ Estado
+
+Repositório de estudo, sem build nem testes automatizados (só `ShowRoom/lumion_final` tem um
+`npm test`, que depende de rodar o clone antes — não executado nesta revisão). Código original
+preservado como histórico; só bugs claros foram corrigidos.
+
+## 🔧 Revisão de 08/10/2026
+
+- `basic(2)/assets/` tinha `Imagem.png` **e** `imagem.png` (mesmo conteúdo). No Windows/macOS, que não
+  diferenciam maiúsculas, o clone já saía "modificado". Ficou só `imagem.png` (a referenciada).
+- `basic(2)/about.html` apontava para `assets/sobre.png`, que não existe → agora usa `imagem.png`.
+- `basic(2)/index.html`: o link do Instagram mostrava ícone e texto de Twitch → ícone `instagram.png` e texto corrigidos.
+- `login/script.js`: no clique em "Log In", `applyNeutral()` religava o rastreio do mouse logo depois
+  de ele ser desligado, e os olhos não ficavam olhando para o botão. Ordem invertida.
+
+## ⏳ Pendências
+
+- `projetos/cafe-website/styles.css` (linha 77) usa `img/home-bg.jpg`, que nunca foi versionada: o hero
+  fica só com o gradiente escuro.
+- `basic(2)` linka `projects.html` e `contact.html`, que não existem (páginas do curso não feitas).
+- `login`: a "respiração" (`startBreathing`) e a tensão do roxo animam `rotation` no mesmo elemento e
+  brigam entre si.
+- `projetos/slider-tourism/scripts.js`: cliques rápidos acumulam vários `setTimeout` de 3 s
+  (falta `clearTimeout`).
+
+## 📚 Para estudar
+
+1. **Seletores, especificidade e BEM** — `basic(2)/styles/style.css` (classes `apresentacao__links__link`).
+   Repare que a classe `aprensetacao_links_subtitulo` tem erro de digitação no HTML e no CSS, por isso
+   "funciona": o CSS não valida nomes.
+2. **`IntersectionObserver` em vez de evento de scroll** — `ShowRoom/studio-template/script.js`, linha 151
+   (reveal) e 240 (contadores com `requestAnimationFrame`).
+3. **Print CSS (`@page`, `mm`/`pt`)** — `projetos/cardapio-digital/impressao.html`, linha 172. Abra e use
+   Ctrl+P para ver a diferença entre tela e papel.
+4. **Carrossel trocando a ordem do DOM** — `projetos/slider-tourism/scripts.js`, `moveItemsOnClick()`:
+   `appendChild` de um nó que já existe *move* o nó em vez de copiar. Compare com o índice `active` de
+   `projetos/soda-ads/scripts.js`.
