@@ -286,11 +286,12 @@ btnLogin.addEventListener('click', (e) => {
     e.preventDefault();
 
     /* Congela tracking e sinaliza o botão */
+    /* Garante que nenhum boneco está em estado de tensão.
+       CORREÇÃO (08/10/2026): applyNeutral() religa o trackingActive, então
+       precisa vir ANTES de congelar — senão os olhos voltavam a seguir o mouse. */
+    applyNeutral();
     trackingActive = false;
     btnLogin.textContent = 'Logging in...';
-
-    /* Garante que nenhum boneco está em estado de tensão */
-    applyNeutral();
 
     /* Pupilas olham para o botão de login */
     allPupils.forEach(pupil => {
