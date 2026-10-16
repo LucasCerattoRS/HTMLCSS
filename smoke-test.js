@@ -2,13 +2,23 @@
 // falha ao carregar, que não há erro de JS e que nenhuma <img> ficou quebrada.
 // Uso: (cd ShowRoom/lumion_final && npm install) && node smoke-test.js
 const path = require('path');
-const { execSync } = require('child_process');
+const fs = require('fs');
 let chromium;
 try { ({ chromium } = require(path.join(__dirname, 'ShowRoom/lumion_final/node_modules/playwright'))); }
 catch { ({ chromium } = require('playwright')); }
 
 (async () => {
-  const files = execSync('git ls-files "*.html"', { cwd: __dirname }).toString().trim().split('\n');
+  // Varre o sistema de arquivos (funciona fora do git e pega .html ainda não commitados).
+  const files = [];
+  (function varrer(dir) {
+    for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
+      if (e.name === 'node_modules' || e.name.startsWith('.')) continue;
+      const p = path.join(dir, e.name);
+      if (e.isDirectory()) varrer(p);
+      else if (e.name.endsWith('.html')) files.push(path.relative(__dirname, p));
+    }
+  })(__dirname);
+  files.sort();
   const browser = await chromium.launch();
   let failures = 0;
   for (const f of files) {

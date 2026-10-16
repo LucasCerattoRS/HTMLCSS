@@ -72,9 +72,11 @@ Repositório de estudo, sem build. Há um smoke test, `smoke-test.js`, que abre 
 Chromium headless e acusa arquivo local que não carrega, erro de JS e `<img>` quebrada:
 
 ```bash
-cd ShowRoom/lumion_final && npm install && cd ../..   # traz o Playwright (precisa de Chromium instalado)
+cd ShowRoom/lumion_final && npm install && npx playwright install chromium && cd ../..   # traz o Playwright e o Chromium da mesma versão
 node smoke-test.js
 ```
+
+Sem rede, páginas que carregam bibliotecas de CDN (ex.: `login`, gsap) podem acusar erro de JS falso.
 
 Além dele, só `ShowRoom/lumion_final` tem um `npm test`, que depende de rodar o clone antes — não
 executado nesta revisão. Código original
