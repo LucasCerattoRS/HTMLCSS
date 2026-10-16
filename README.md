@@ -41,6 +41,8 @@ Cada pasta é independente — basta abrir o `index.html` no navegador:
 # exemplo
 cd projetos/cafe-website
 start index.html      # Windows
+open index.html       # macOS
+xdg-open index.html   # Linux
 ```
 
 ### `ShowRoom/lumion_final/`
@@ -66,8 +68,16 @@ npm run serve     # abre o clone localmente
 
 ## ✅ Estado
 
-Repositório de estudo, sem build nem testes automatizados (só `ShowRoom/lumion_final` tem um
-`npm test`, que depende de rodar o clone antes — não executado nesta revisão). Código original
+Repositório de estudo, sem build. Há um smoke test, `smoke-test.js`, que abre todos os `.html` em
+Chromium headless e acusa arquivo local que não carrega, erro de JS e `<img>` quebrada:
+
+```bash
+cd ShowRoom/lumion_final && npm install && cd ../..   # traz o Playwright (precisa de Chromium instalado)
+node smoke-test.js
+```
+
+Além dele, só `ShowRoom/lumion_final` tem um `npm test`, que depende de rodar o clone antes — não
+executado nesta revisão. Código original
 preservado como histórico; só bugs claros foram corrigidos.
 
 ## 🔧 Revisão de 08/10/2026
@@ -81,8 +91,9 @@ preservado como histórico; só bugs claros foram corrigidos.
 
 ## ⏳ Pendências
 
-- `projetos/cafe-website/styles.css` (linha 77) usa `img/home-bg.jpg`, que nunca foi versionada: o hero
-  fica só com o gradiente escuro.
+- `projetos/cafe-website/styles.css` (linha 77) cita `img/home-bg.jpg`, que nunca foi versionada, mas a
+  regra seguinte de `.home-container` (linha 88) a sobrescreve e o hero mostra `img/home-img.jpg`, sem o
+  gradiente escuro. Nenhum arquivo falha ao carregar; a primeira declaração de `background` é código morto.
 - `basic(2)` linka `projects.html` e `contact.html`, que não existem (páginas do curso não feitas).
 - `login`: a "respiração" (`startBreathing`) e a tensão do roxo animam `rotation` no mesmo elemento e
   brigam entre si.
