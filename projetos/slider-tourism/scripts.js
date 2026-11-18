@@ -5,6 +5,10 @@ let container = document.querySelector('.container')
 let list = document.querySelector('.container .list')
 let thumb = document.querySelector('.container .thumb')
 
+// Um só timer: cliques rápidos não podem deixar vários setTimeout de 3 s
+// vivos, senão o do 1º clique tira a classe no meio da animação do 2º.
+let timeoutId
+
 btnNext.onclick = () => {
     moveItemsOnClick('next')
 }
@@ -13,6 +17,9 @@ btnBack.onclick = () => {
 }
 
 function moveItemsOnClick(type) {
+    clearTimeout(timeoutId)
+    container.classList.remove('next', 'back')
+
     let listItems = document.querySelectorAll('.list .list-item')
     let thumbItems = document.querySelectorAll('.thumb .thumb-item')
 
@@ -27,7 +34,7 @@ function moveItemsOnClick(type) {
         container.classList.add('back')
     }
 
-    setTimeout(() => {
+    timeoutId = setTimeout(() => {
         container.classList.remove('next')
         container.classList.remove('back')
     }, 3000)
