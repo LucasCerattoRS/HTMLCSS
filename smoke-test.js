@@ -34,6 +34,24 @@ catch { ({ chromium } = require('playwright')); }
       const bg = await page.evaluate(() => getComputedStyle(document.querySelector('.home-container')).backgroundImage);
       if (!bg.includes('home-img.jpg')) errs.push('hero sem home-img.jpg: ' + bg);
     }
+    if (f === 'projetos/slider-tourism/index.html') {
+      // Relógio falso: um timer só, que conta a partir do último clique. Seletor `button.`:
+      // `.next`/`.back` sozinhos também casam com o .container durante a animação.
+      await page.clock.install();
+      await page.reload();
+      const classes = () => page.evaluate(() => document.querySelector('.container').className);
+      await page.click('button.next');
+      await page.clock.runFor(2000);
+      await page.click('button.next');
+      await page.clock.runFor(1500);
+      if (!(await classes()).includes('next')) errs.push('slider: timer do 1º clique cortou a animação do 2º');
+      await page.clock.runFor(1600);
+      if ((await classes()).includes('next')) errs.push('slider: classe next não saiu 3 s após o último clique');
+      await page.click('button.next');
+      await page.click('button.back');
+      const c = await classes();
+      if (c.includes('next') || !c.includes('back')) errs.push('slider: next e back juntos após troca rápida: ' + c);
+    }
     console.log(errs.length ? 'FALHA' : 'ok   ', f);
     errs.forEach(e => console.log('      ' + e));
     failures += errs.length;

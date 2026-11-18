@@ -91,6 +91,13 @@ preservado como histórico; só bugs claros foram corrigidos.
 - `login/script.js`: no clique em "Log In", `applyNeutral()` religava o rastreio do mouse logo depois
   de ele ser desligado, e os olhos não ficavam olhando para o botão. Ordem invertida.
 
+## 🔧 Revisão de 18/11/2026
+
+- `projetos/slider-tourism/scripts.js`: cliques rápidos deixavam vários `setTimeout` de 3 s
+  vivos; o do 1º clique tirava a classe no meio da animação do 2º, e ir e voltar rápido deixava
+  `next` e `back` juntas. Agora há um timer só (`clearTimeout`), e o `smoke-test.js` confere isso com
+  relógio falso do Playwright.
+
 ## ⏳ Pendências
 
 - `projetos/cafe-website/styles.css` (linha 77) cita `img/home-bg.jpg`, que nunca foi versionada, mas a
@@ -99,8 +106,6 @@ preservado como histórico; só bugs claros foram corrigidos.
 - `basic(2)` linka `projects.html` e `contact.html`, que não existem (páginas do curso não feitas).
 - `login`: a "respiração" (`startBreathing`) e a tensão do roxo animam `rotation` no mesmo elemento e
   brigam entre si.
-- `projetos/slider-tourism/scripts.js`: cliques rápidos acumulam vários `setTimeout` de 3 s
-  (falta `clearTimeout`).
 
 ## 📚 Para estudar
 
